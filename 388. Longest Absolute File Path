@@ -1,111 +1,17 @@
 /**/
 public int lengthLongestPath(String input) {
-		if (input == null || input.length() == 0) {
-			return 0;
-		}
-		
-		//计算出有多少个文件
-		System.out.println(input);
-		String tem1[] = input.split("\\.");
-		int fileSize = 0;
-		if (tem1 != null) {
-			fileSize = tem1.length - 1;
-		}
-		
-		System.out.println("fileSize:" + fileSize);			
-
-		int[] locatIndex = new int[fileSize];
-		for (int i = 0; i < fileSize; i++) {
-			if (i == 0) {
-				locatIndex[i] = input.indexOf(".");
-			} else {
-				locatIndex[i] = input.indexOf(".", locatIndex[i - 1] + 1);
-			}
-//			System.out.println("lacaion: " + locatIndex[i]);
-		}
-		
-		
-		//找出文件名
-		String fileNames[] = new String[2];					
-		for (int i = 0; i < locatIndex.length; i++) {
-
-			int index = locatIndex[i];
-			String subLeftStr = input.substring(0, index);
-			String subRightStr = input.substring(index + 1);
-//			System.out.println("subLeftStr :" + subLeftStr);
-//			System.out.println("subRightStr:" + subRightStr);
-
-			int lastIndex = subLeftStr.lastIndexOf("\t");
-			String fileName = subLeftStr.substring(lastIndex + 1);
-//			System.out.println("fileName :" + fileName);
-
-			String fileExtra = "";
-			int firstIndex = subRightStr.indexOf("\n");
-			if (firstIndex == -1) {
-				fileExtra = subRightStr;
-			} else {
-				fileExtra = subRightStr.substring(0, firstIndex);
-			}
-//			System.out.println("fileExtra :" + fileExtra);
-
-			System.out.println("file	:" + fileName + "." + fileExtra);
-			fileNames[i] = fileName+"."+fileExtra;
-		}		
-		
-
-		//找出文件的绝对路径并保存
-		int rootIndex = input.indexOf("\n");
-		String rooDirName = input.substring(0,rootIndex);
-		System.out.println("rooDirName:"+rooDirName);
-		List<List<String>> dirList = new ArrayList<List<String>>();		
-		
-		for (int i = 0; i < fileNames.length; i++) {
-			List<String> list = new ArrayList<String>();
-			list.add(fileNames[i]);
-			int fileIndex = input.indexOf(fileNames[i]);
-			String subFileStr = input.substring(0, fileIndex);
-			int indexofTab = subFileStr.lastIndexOf("\n");
-			String tabStr = subFileStr.substring(indexofTab, fileIndex);
-			int tabSize  = tabStr.length()-1;
-//			System.out.println("tabSize:"+tabSize);
-			String beforTabStr = subFileStr.substring(0,indexofTab);
-			for(int j = tabSize-1;j >=1; j--){
-				StringBuffer tempBuff = new StringBuffer("\n");
-				for(int m = 1; m<=j;m++){
-					tempBuff.append("\t");
-				}
-				String buffStr = tempBuff.toString();
-				int bufferIndex =beforTabStr.lastIndexOf(buffStr);
-				String dirName = beforTabStr.substring(bufferIndex+buffStr.length());
-				beforTabStr = subFileStr.substring(0, bufferIndex);
-//				System.out.println("dirName:"+dirName);
-				list.add(dirName);
-			}
-			
-			list.add(rooDirName);
-			Collections.reverse(list);
-			dirList.add(list);
-		}
-		
-		String fileAbsultPath[] = new String[dirList.size()];
-		for (int i = 0; i < dirList.size(); i++) {
-			List<String> tempList =dirList.get(i);
-			StringBuffer temFilePahBuffer = new StringBuffer();
-			for (int j = 0; j < tempList.size(); j++) {
-				temFilePahBuffer.append(tempList.get(j)+"/");
-			}
-			String tempStr = temFilePahBuffer.substring(0, temFilePahBuffer.length()-1);
-			fileAbsultPath[i] = tempStr;
-		}
-		
-		//比较绝对路径的长度
-		int maxNum = 0;
-		for (int i = 0; i < fileAbsultPath.length; i++) {
-			if (fileAbsultPath[i].length()>=maxNum) {
-				maxNum = fileAbsultPath[i].length();
-			}
-			System.out.println("filePath:"+fileAbsultPath[i]);
-		}
-		
-		return maxNum;
+	int maxLenth = 0;
+	if ((input==null)||(input.length()==0)) {
+		return maxLenth;
 	}
+	int [] stack = new int[input.lastIndexOf("\n")+3];
+	
+	for(String s :input.split("\n")){
+		int len = s.lastIndexOf("\t")+1;				//   "\t"的个数
+		stack[len+1] = stack[len]+s.length()-len+1;			//	+1 是指 "/"
+		if (s.contains(".")) {
+			maxLenth = Math.max(stack[len+1]-1, maxLenth);		//  -1 是指 最后一个文件的"/"
+		}
+	}
+	return maxLenth;
+}
